@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>홈런 문해력 분석 대시보드</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Apple SD Gothic Neo','맑은 고딕',sans-serif;background:#F5F4F0;color:#1a1a1a;min-height:100vh}
+header{background:#fff;border-bottom:1px solid #e8e8e8;padding:14px 24px;display:flex;align-items:center;gap:12px}
+.logo{width:34px;height:34px;background:#E05A1A;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+header h1{font-size:17px;font-weight:700;color:#1a1a1a}
+header .sub{font-size:12px;color:#aaa;margin-left:6px}
+.layout{display:grid;grid-template-columns:190px 1fr;height:calc(100vh - 63px)}
+.sidebar{background:#fff;border-right:1px solid #e8e8e8;padding:10px 6px;overflow-y:auto}
+.sidebar-label{font-size:10px;color:#bbb;padding:0 8px 4px;letter-spacing:0.08em}
+.sidebar-section-title{font-size:10px;font-weight:700;color:#E05A1A;padding:6px 10px 4px;letter-spacing:0.05em;text-transform:uppercase}
+.stu-btn{width:100%;text-align:left;border:none;background:transparent;padding:5px 8px;border-radius:8px;cursor:pointer;color:#555;transition:all 0.15s;display:flex;align-items:center;gap:6px;margin-bottom:1px}
+.stu-btn:hover{background:#FFF4EC;color:#C2440A}
+.stu-btn.active{background:#FFF4EC;color:#C2440A;font-weight:600}
+.avatar{width:22px;height:22px;border-radius:50%;background:#f0f0f0;color:#888;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stu-btn.active .avatar{background:#E05A1A;color:#fff}
+.stu-name-wrap{display:flex;flex-direction:column;gap:0px;flex:1;min-width:0}
+.stu-nm{font-size:12px;font-weight:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stu-grade-tag{font-size:10px;color:#bbb;font-weight:400}
+.stu-btn.active .stu-grade-tag{color:#C2440A;opacity:0.7}
+.main{padding:18px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.top-bar{display:flex;align-items:flex-end;justify-content:space-between}
+.stu-name{font-size:20px;font-weight:700}
+.stu-sub{font-size:12px;color:#999;margin-top:2px}
+.badge{background:#FFF4EC;color:#C2440A;border:1px solid #FECDAA;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:500}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.card{background:#fff;border:1px solid #ebebeb;border-radius:12px;padding:14px 16px}
+.card-label{font-size:11px;color:#bbb;margin-bottom:6px;font-weight:500}
+.card-value{font-size:24px;font-weight:700;color:#1a1a1a}
+.card-value.orange{color:#E05A1A}
+.card-value.up{color:#16A34A}
+.card-value.down{color:#DC2626}
+.charts-row{display:grid;grid-template-columns:1.8fr 1fr;gap:12px}
+.chart-box{background:#fff;border:1px solid #ebebeb;border-radius:12px;padding:16px}
+.chart-title{font-size:12px;font-weight:600;color:#444;margin-bottom:4px}
+.chart-sub{font-size:11px;color:#bbb;margin-bottom:12px}
+.legend-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.leg{display:flex;align-items:center;gap:4px;font-size:11px;color:#666}
+.leg-sq{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.bottom-row{display:grid;grid-template-columns:1fr 1.9fr;gap:12px}
+table.bt{width:100%;font-size:12px;border-collapse:collapse;table-layout:fixed}
+table.bt th{color:#bbb;font-weight:500;padding:4px 8px;text-align:left;border-bottom:1px solid #f0f0f0;font-size:11px}
+table.bt td{padding:6px 8px;color:#555;border-bottom:1px solid #f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.eval-section{background:#fff;border:1px solid #ebebeb;border-radius:12px;padding:16px}
+.eval-section .chart-title{margin-bottom:14px}
+.eval-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.eval-card{border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.eval-tag{font-size:11px;font-weight:700;letter-spacing:0.04em}
+.eval-name{font-size:11px;color:#888;margin-top:-4px}
+.eval-text{font-size:12px;line-height:1.55;color:#444}
+.eval-score{font-size:18px;font-weight:700;margin-top:4px}
+.oneliner{margin-top:12px;background:#F8F7F4;border-left:3px solid #E05A1A;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#444;line-height:1.6}
+.oneliner strong{color:#C2440A;font-weight:600}
+.rank-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:auto;flex-shrink:0}
+.rank-1{background:#FFD700;color:#7A5500}
+.rank-2{background:#C0C0C0;color:#4A4A4A}
+.rank-3{background:#CD7F32;color:#5A3A00}
+.rank-top{background:#FFF4EC;color:#C2440A}
+.rank-mid{background:#F3F4F6;color:#6B7280}
+.rank-low{background:#F3F4F6;color:#9CA3AF}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">홈런</div>
+  <h1>문해력 분석 대시보드</h1>
+  <span class="sub">전체 15명</span>
+</header>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-label">학생 목록</div>
+    <div id="stu-list"></div>
+  </div>
+  <div class="main">
+    <div class="top-bar">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="stu-name" id="stu-title">—</div>
+        <span id="stu-grade-badge" style="font-size:12px;font-weight:600;color:#C2440A;background:#FFF4EC;border:1px solid #FECDAA;border-radius:20px;padding:3px 10px;white-space:nowrap">—</span>
+        <span id="stu-diag-badge" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #e0e0e0;white-space:nowrap">—</span>
+      </div>
+      
+    </div>
+    <div class="cards">
+      <div class="card"><div class="card-label">초기 종합점수</div><div class="card-value" id="s-early">—</div></div>
+      <div class="card"><div class="card-label">후기 종합점수</div><div class="card-value orange" id="s-late">—</div></div>
+      <div class="card"><div class="card-label">성장 변화폭</div><div class="card-value" id="s-delta">—</div></div>
+      <div class="card"><div class="card-label">총 독서 기록</div><div class="card-value" id="s-books">—</div></div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">역량별 성장 추이</div>
+        <div class="chart-sub">초기 / 중기 / 후기 평균 점수</div>
+        <div id="line-legend" class="legend-row"></div>
+        <div style="position:relative;height:180px"><canvas id="lineChart"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">역량 프로필</div>
+        <div class="chart-sub">후기 기준 5개 영역</div>
+        <div style="position:relative;height:200px"><canvas id="radarChart"></canvas></div>
+      </div>
+    </div>
+    <div class="eval-section">
+      <div class="chart-title">전문가 평가 내역 <span style="font-size:11px;color:#bbb;font-weight:400">후기 점수 기준</span></div>
+      <div class="eval-grid" id="eval-grid"></div>
+      <div class="oneliner" id="eval-oneliner"></div>
+    </div>
+    <div class="bottom-row">
+      <div class="chart-box">
+        <div class="chart-title">장르별 독서 분포</div>
+        <div class="chart-sub" style="margin-bottom:8px">전체 기간</div>
+        <div style="position:relative;height:150px"><canvas id="genreChart"></canvas></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">최근 독서 기록</div>
+        <div class="chart-sub" style="margin-bottom:8px">최근 5권</div>
+        <table class="bt">
+          <thead><tr>
+            <th style="width:60px">날짜</th>
+            <th>도서명</th>
+            <th style="width:55px">장르</th>
+            <th style="width:50px">점수</th>
+          </tr></thead>
+          <tbody id="books-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const DATA = {"김시경":{"ref": {"final_rank": 3, "gap_rank": 1, "grade": "5학년", "records": 98, "initial": 53.1, "final": 83.8, "gap": 30.7, "pct": "상위 20.0%", "group": "우수 성장"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "인과 접속사와 전개 연결이 뚜렷해 논리 구조가 강점입니다.", "CI": "자기 해석과 가치 판단이 활발하게 드러납니다.", "HS": "주기적 참여가 유지되어 습관 기반은 확보된 상태입니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 51.0, "CI_점수": 51.0, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 53.1}, "중기": {"BW_점수": 100.0, "SO_점수": 55.0, "CI_점수": 53.6, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 68.5}, "후기": {"BW_점수": 100.0, "SO_점수": 63.4, "CI_점수": 64.1, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 83.8}}, "genres": {"기타": 95, "인문사회": 1, "문학": 1, "자연과학": 1}, "books": {"초기": 32, "중기": 32, "후기": 34}, "recent": [{"날짜": "2026-03-09", "도서명": "셰익스피어의 4대 비극 - 햄릿 (출판사 무관)", "장르": "기타", "최종_종합점수": 83.8}, {"날짜": "2026-03-08", "도서명": "캣슈타인 박사의 냥냥 호기심 펀치 5 수학이 궁금해 (아이스크림북스)", "장르": "자연과학", "최종_종합점수": 83.8}, {"날짜": "2026-03-07", "도서명": "찰랑찰랑 사랑 하나 (위즈덤하우스)", "장르": "기타", "최종_종합점수": 83.8}, {"날짜": "2026-03-06", "도서명": "생각 깨우기 (푸른숲주니어)", "장르": "기타", "최종_종합점수": 83.8}, {"날짜": "2026-03-05", "도서명": "춘향전 (출판사 무관)", "장르": "기타", "최종_종합점수": 83.8}]},"이다민":{"ref": {"final_rank": 12, "gap_rank": 2, "grade": "3학년", "records": 129, "initial": 51.8, "final": 74.8, "gap": 23.0, "pct": "상위 80.0%", "group": "집중 관리"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "사실 나열 비중이 높아 인과 표현 보강이 필요합니다.", "CI": "기초 의견 표시는 있으나 비판적 확장 여지가 남아 있습니다.", "HS": "100건 안팎의 기록이 유지되어 독서 루틴이 안정적으로 형성되었습니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 44.7, "CI_점수": 26.3, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 51.8}, "중기": {"BW_점수": 100.0, "SO_점수": 42.6, "CI_점수": 28.4, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 63.3}, "후기": {"BW_점수": 100.0, "SO_점수": 49.5, "CI_점수": 37.4, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 74.8}}, "genres": {"인문사회": 10, "기타": 112, "문학": 2, "자연과학": 5}, "books": {"초기": 43, "중기": 43, "후기": 43}, "recent": [{"날짜": "2026-03-09", "도서명": "베르메유의 숲: 이상한 오후의 핑크빛 소풍 (바둑이하우스)", "장르": "기타", "최종_종합점수": 74.8}, {"날짜": "2026-03-08", "도서명": "이게 바로 수학이야: 매일 만나는 신나는 생활 수학 (모알보알)", "장르": "자연과학", "최종_종합점수": 74.8}, {"날짜": "2026-03-07", "도서명": "천재 의사 시건방 2 - 새우등 마을을 탈출하라 (머스트비)", "장르": "기타", "최종_종합점수": 74.8}, {"날짜": "2026-03-06", "도서명": "천재 의사 시건방 1 - 깡시골 어벤져스의 비밀 (머스트비)", "장르": "기타", "최종_종합점수": 74.8}, {"날짜": "2026-03-05", "도서명": "오늘은 수영장 가는 날: 나와 너를 지키는 초등 생존수영 (노란돼지)", "장르": "기타", "최종_종합점수": 74.8}]},"김근주":{"ref": {"final_rank": 11, "gap_rank": 3, "grade": "5학년", "records": 123, "initial": 56.9, "final": 78.4, "gap": 21.5, "pct": "상위 73.3%", "group": "안정 궤도"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "이유-결과 연결은 보이지만 접속 구조의 다양화가 더 필요합니다.", "CI": "감상과 자기 의견이 안정적으로 표현됩니다.", "HS": "100건 안팎의 기록이 유지되어 독서 루틴이 안정적으로 형성되었습니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 50.6, "CI_점수": 56.7, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 56.9}, "중기": {"BW_점수": 100.0, "SO_점수": 56.1, "CI_점수": 44.4, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 67.7}, "후기": {"BW_점수": 100.0, "SO_점수": 65.0, "CI_점수": 47.8, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 78.4}}, "genres": {"기타": 123}, "books": {"초기": 41, "중기": 41, "후기": 41}, "recent": [{"날짜": "2026-03-09", "도서명": "원더우먼은 없다 (작은코도마뱀)", "장르": "기타", "최종_종합점수": 78.4}, {"날짜": "2026-03-08", "도서명": "선생님과 떠나는 하루 답사 2 (나무의말)", "장르": "기타", "최종_종합점수": 78.4}, {"날짜": "2026-03-07", "도서명": "나는 단단한 아이 (해와나무)", "장르": "기타", "최종_종합점수": 78.4}, {"날짜": "2026-03-06", "도서명": "불꽃이 된 독립운동가 매헌 윤봉길 (스푼북)", "장르": "기타", "최종_종합점수": 78.4}, {"날짜": "2026-03-05", "도서명": "태구는 이웃들을 기다린다 (주니어RHK)", "장르": "기타", "최종_종합점수": 78.4}]},"이사벨":{"ref": {"final_rank": 5, "gap_rank": 4, "grade": "7세", "records": 217, "initial": 61.5, "final": 82.6, "gap": 21.1, "pct": "상위 33.3%", "group": "우수 성장"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "사실 나열 비중이 높아 인과 표현 보강이 필요합니다.", "CI": "개인 의견은 있으나 성찰 문장 확장이 더 필요합니다.", "HS": "매우 높은 빈도의 기록이 누적되어 습관의 항상성이 매우 우수합니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 43.3, "CI_점수": 36.0, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 61.5}, "중기": {"BW_점수": 100.0, "SO_점수": 43.3, "CI_점수": 35.3, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 72.0}, "후기": {"BW_점수": 100.0, "SO_점수": 47.3, "CI_점수": 35.3, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 82.6}}, "genres": {"기타": 93, "문학": 2, "자연과학": 7}, "books": {"초기": 34, "중기": 34, "후기": 34}, "recent": [{"날짜": "2026-03-10", "도서명": "고모가 생길 뻔한 날 (봄마중)", "장르": "기타", "최종_종합점수": 82.6}, {"날짜": "2026-03-09", "도서명": "바다거북이 장례식 (도토리숲)", "장르": "기타", "최종_종합점수": 82.6}, {"날짜": "2026-03-08", "도서명": "언어 예절, 이것만은 알아 둬! (팜파스)", "장르": "기타", "최종_종합점수": 82.6}, {"날짜": "2026-03-07", "도서명": "엉뚱한 수리점 (플라이쿠키)", "장르": "기타", "최종_종합점수": 82.6}, {"날짜": "2026-03-06", "도서명": "친구랑 함께한 세계여행 (시금치)", "장르": "기타", "최종_종합점수": 82.6}]},"이희정":{"ref": {"final_rank": 7, "gap_rank": 5, "grade": "3학년", "records": 97, "initial": 61.4, "final": 82.0, "gap": 20.6, "pct": "상위 46.7%", "group": "안정 궤도"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "이유-결과 연결은 보이지만 접속 구조의 다양화가 더 필요합니다.", "CI": "기초 의견 표시는 있으나 비판적 확장 여지가 남아 있습니다.", "HS": "주기적 참여가 유지되어 습관 기반은 확보된 상태입니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 49.7, "CI_점수": 53.1, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 61.4}, "중기": {"BW_점수": 100.0, "SO_점수": 50.7, "CI_점수": 56.4, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 71.7}, "후기": {"BW_점수": 100.0, "SO_점수": 56.6, "CI_점수": 60.7, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 82.0}}, "genres": {"기타": 87, "자연과학": 1, "인문사회": 6, "문학": 3}, "books": {"초기": 32, "중기": 32, "후기": 33}, "recent": [{"날짜": "2026-03-02", "도서명": "고양이 해결사 깜냥 1 (창비)", "장르": "기타", "최종_종합점수": 82.0}, {"날짜": "2026-03-01", "도서명": "푸른 사자 와니니 9 (창비)", "장르": "기타", "최종_종합점수": 82.0}, {"날짜": "2026-02-28", "도서명": "푸른 사자 와니니 8 (창비)", "장르": "기타", "최종_종합점수": 82.0}, {"날짜": "2026-02-27", "도서명": "푸른 사자 와니니 7 (창비)", "장르": "기타", "최종_종합점수": 82.0}, {"날짜": "2026-02-26", "도서명": "푸른 사자 와니니 6 (창비)", "장르": "기타", "최종_종합점수": 82.0}]},"엄희재":{"ref": {"final_rank": 13, "gap_rank": 6, "grade": "4학년", "records": 101, "initial": 52.5, "final": 70.0, "gap": 17.5, "pct": "상위 86.7%", "group": "집중 관리"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "이유-결과 연결은 보이지만 접속 구조의 다양화가 더 필요합니다.", "CI": "내용 요약 중심으로, 자기 관점 문장 확대가 필요합니다.", "HS": "100건 안팎의 기록이 유지되어 독서 루틴이 안정적으로 형성되었습니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 42.7, "CI_점수": 30.0, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 52.5}, "중기": {"BW_점수": 100.0, "SO_점수": 44.0, "CI_점수": 26.7, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 61.2}, "후기": {"BW_점수": 100.0, "SO_점수": 46.0, "CI_점수": 26.0, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 70.0}}, "genres": {"기타": 95, "자연과학": 2, "인문사회": 4}, "books": {"초기": 33, "중기": 33, "후기": 35}, "recent": [{"날짜": "2026-03-08", "도서명": "하늘 고래의 노래 (국민서관)", "장르": "기타", "최종_종합점수": 70.0}, {"날짜": "2026-03-06", "도서명": "우리들의 여름 크리스마스 (길벗스쿨)", "장르": "기타", "최종_종합점수": 70.0}, {"날짜": "2026-03-05", "도서명": "이모의 꿈꾸는 집 (문학과지성사)", "장르": "기타", "최종_종합점수": 70.0}, {"날짜": "2026-03-04", "도서명": "노이지 효과 (종이종)", "장르": "기타", "최종_종합점수": 70.0}, {"날짜": "2026-03-03", "도서명": "마지막 거인 (디자인하우스)", "장르": "기타", "최종_종합점수": 70.0}]},"윤희찬":{"ref": {"final_rank": 9, "gap_rank": 7, "grade": "1학년", "records": 100, "initial": 66.3, "final": 80.2, "gap": 13.9, "pct": "상위 60.0%", "group": "안정 궤도"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "이유-결과 연결은 보이지만 접속 구조의 다양화가 더 필요합니다.", "CI": "내용 요약 중심으로, 자기 관점 문장 확대가 필요합니다.", "HS": "100건 안팎의 기록이 유지되어 독서 루틴이 안정적으로 형성되었습니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 41.3, "CI_점수": 26.0, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 66.3}, "중기": {"BW_점수": 100.0, "SO_점수": 44.7, "CI_점수": 23.3, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 73.2}, "후기": {"BW_점수": 100.0, "SO_점수": 43.3, "CI_점수": 23.3, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 80.2}}, "genres": {"기타": 95, "자연과학": 5}, "books": {"초기": 33, "중기": 33, "후기": 34}, "recent": [{"날짜": "2026-02-25", "도서명": "화내지 말고 예쁘게 말해요 (상상스쿨)", "장르": "기타", "최종_종합점수": 80.2}, {"날짜": "2026-02-24", "도서명": "고마워요 선생님 (별글)", "장르": "기타", "최종_종합점수": 80.2}, {"날짜": "2026-02-23", "도서명": "인사 (책읽는곰)", "장르": "기타", "최종_종합점수": 80.2}, {"날짜": "2026-02-22", "도서명": "가시 소년 (천개의바람 )", "장르": "기타", "최종_종합점수": 80.2}, {"날짜": "2026-02-21", "도서명": "감자 감자 뿅 (킨더랜드)", "장르": "기타", "최종_종합점수": 80.2}]},"김도은":{"ref": {"final_rank": 14, "gap_rank": 8, "grade": "5학년", "records": 102, "initial": 54.6, "final": 68.2, "gap": 13.6, "pct": "상위 93.3%", "group": "집중 관리"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "사실 나열 비중이 높아 인과 표현 보강이 필요합니다.", "CI": "개인 의견은 있으나 성찰 문장 확장이 더 필요합니다.", "HS": "100건 안팎의 기록이 유지되어 독서 루틴이 안정적으로 형성되었습니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 42.0, "CI_점수": 36.7, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 54.6}, "중기": {"BW_점수": 100.0, "SO_점수": 41.3, "CI_점수": 34.7, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 61.4}, "후기": {"BW_점수": 100.0, "SO_점수": 43.3, "CI_점수": 44.0, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 68.2}}, "genres": {"기타": 98, "문학": 2, "자연과학": 2}, "books": {"초기": 34, "중기": 34, "후기": 34}, "recent": [{"날짜": "2026-02-17", "도서명": "톰 소여의 모험 3", "장르": "기타", "최종_종합점수": 68.2}, {"날짜": "2026-02-16", "도서명": "톰 소여의 모험 2", "장르": "기타", "최종_종합점수": 68.2}, {"날짜": "2026-02-15", "도서명": "아름다운 아이 화이트 버드 (책과콩나무)", "장르": "기타", "최종_종합점수": 68.2}, {"날짜": "2026-02-14", "도서명": "봄날이 달려온다 (별숲)", "장르": "기타", "최종_종합점수": 68.2}, {"날짜": "2026-02-13", "도서명": "톰 소여의 모험 1", "장르": "기타", "최종_종합점수": 68.2}]},"최지온":{"ref": {"final_rank": 2, "gap_rank": 9, "grade": "2학년", "records": 93, "initial": 72.3, "final": 85.6, "gap": 13.3, "pct": "상위 13.3%", "group": "TOP 리더"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "사실 나열 비중이 높아 인과 표현 보강이 필요합니다.", "CI": "내용 요약 중심으로, 자기 관점 문장 확대가 필요합니다.", "HS": "주기적 참여가 유지되어 습관 기반은 확보된 상태입니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 44.4, "CI_점수": 41.5, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 72.3}, "중기": {"BW_점수": 100.0, "SO_점수": 44.6, "CI_점수": 44.6, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 78.9}, "후기": {"BW_점수": 100.0, "SO_점수": 50.4, "CI_점수": 43.0, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 85.6}}, "genres": {"기타": 91, "자연과학": 2}, "books": {"초기": 31, "중기": 31, "후기": 31}, "recent": [{"날짜": "2026-03-09", "도서명": "도서관에 달팽이라니! (머핀북)", "장르": "기타", "최종_종합점수": 85.6}, {"날짜": "2026-03-08", "도서명": "멸종 동물 소원 카드 배달 왔어요 (철수와영희)", "장르": "자연과학", "최종_종합점수": 85.6}, {"날짜": "2026-03-07", "도서명": "수줍은 괴물 조르지오 (노는날)", "장르": "기타", "최종_종합점수": 85.6}, {"날짜": "2026-03-06", "도서명": "동백꽃 (출판사 무관)", "장르": "기타", "최종_종합점수": 85.6}, {"날짜": "2026-03-05", "도서명": "플랜더스의 개 (출판사 무관)", "장르": "기타", "최종_종합점수": 85.6}]},"이채윤":{"ref": {"final_rank": 15, "gap_rank": 9, "grade": "4학년", "records": 98, "initial": 54.3, "final": 67.6, "gap": 13.3, "pct": "상위 100.0%", "group": "집중 관리"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "사실 나열 비중이 높아 인과 표현 보강이 필요합니다.", "CI": "내용 요약 중심으로, 자기 관점 문장 확대가 필요합니다.", "HS": "주기적 참여가 유지되어 습관 기반은 확보된 상태입니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 41.4, "CI_점수": 25.5, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 54.3}, "중기": {"BW_점수": 100.0, "SO_점수": 41.4, "CI_점수": 25.7, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 60.9}, "후기": {"BW_점수": 100.0, "SO_점수": 47.6, "CI_점수": 24.8, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 67.6}}, "genres": {"기타": 87, "인문사회": 9, "문학": 1, "자연과학": 1}, "books": {"초기": 32, "중기": 32, "후기": 34}, "recent": [{"날짜": "2026-03-09", "도서명": "북극곰 고미의 환경 NGO 활동기 (책내음)", "장르": "기타", "최종_종합점수": 67.6}, {"날짜": "2026-03-08", "도서명": "임시 정부의 외교 특파원 서영해 (마음이음)", "장르": "기타", "최종_종합점수": 67.6}, {"날짜": "2026-03-07", "도서명": "걸리버 여행기 (출판사 무관)", "장르": "기타", "최종_종합점수": 67.6}, {"날짜": "2026-03-05", "도서명": "몸 튼튼 마음 튼튼 (계수나무)", "장르": "기타", "최종_종합점수": 67.6}, {"날짜": "2026-03-04", "도서명": "한밤중 달빛 식당 (비룡소)", "장르": "기타", "최종_종합점수": 67.6}]},"김윤주":{"ref": {"final_rank": 1, "gap_rank": 11, "grade": "2학년", "records": 99, "initial": 74.8, "final": 88.0, "gap": 13.2, "pct": "상위 6.7%", "group": "TOP 리더"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "인과 접속사와 전개 연결이 뚜렷해 논리 구조가 강점입니다.", "CI": "내용 요약 중심으로, 자기 관점 문장 확대가 필요합니다.", "HS": "주기적 참여가 유지되어 습관 기반은 확보된 상태입니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 57.9, "CI_점수": 31.0, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 74.8}, "중기": {"BW_점수": 100.0, "SO_점수": 66.4, "CI_점수": 24.3, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 81.4}, "후기": {"BW_점수": 100.0, "SO_점수": 64.1, "CI_점수": 26.9, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 88.0}}, "genres": {"기타": 94, "자연과학": 3, "문학": 2}, "books": {"초기": 33, "중기": 33, "후기": 33}, "recent": [{"날짜": "2026-03-09", "도서명": "고양이 해결사 깜냥 7 (창비)", "장르": "기타", "최종_종합점수": 88.0}, {"날짜": "2026-03-08", "도서명": "고양이 해결사 깜냥 6 (창비)", "장르": "기타", "최종_종합점수": 88.0}, {"날짜": "2026-03-07", "도서명": "달달곰 과자가게 1 (아이스크림북스)", "장르": "기타", "최종_종합점수": 88.0}, {"날짜": "2026-03-06", "도서명": "고양이 해결사 깜냥 5 (창비)", "장르": "기타", "최종_종합점수": 88.0}, {"날짜": "2026-03-05", "도서명": "달달곰 과자가게 2 (아이스크림북스)", "장르": "기타", "최종_종합점수": 88.0}]},"이수정":{"ref": {"final_rank": 8, "gap_rank": 12, "grade": "6세", "records": 107, "initial": 68.7, "final": 81.4, "gap": 12.7, "pct": "상위 53.3%", "group": "안정 궤도"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "인과 접속사와 전개 연결이 뚜렷해 논리 구조가 강점입니다.", "CI": "내용 요약 중심으로, 자기 관점 문장 확대가 필요합니다.", "HS": "100건 안팎의 기록이 유지되어 독서 루틴이 안정적으로 형성되었습니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 46.9, "CI_점수": 25.0, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 68.7}, "중기": {"BW_점수": 100.0, "SO_점수": 48.8, "CI_점수": 23.8, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 75.1}, "후기": {"BW_점수": 100.0, "SO_점수": 48.1, "CI_점수": 23.8, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 81.4}}, "genres": {"기타": 106, "문학": 1}, "books": {"초기": 35, "중기": 35, "후기": 37}, "recent": [{"날짜": "2026-03-10", "도서명": "잡아먹혀 봅시다 (시공주니어)", "장르": "기타", "최종_종합점수": 81.4}, {"날짜": "2026-03-09", "도서명": "판타스틱 반찬 특공대 (노는날)", "장르": "기타", "최종_종합점수": 81.4}, {"날짜": "2026-03-08", "도서명": "빵이 된 백곰 (길벗스쿨)", "장르": "기타", "최종_종합점수": 81.4}, {"날짜": "2026-03-07", "도서명": "곤충 호텔 (소원나무)", "장르": "기타", "최종_종합점수": 81.4}, {"날짜": "2026-03-06", "도서명": "멸치 다듬기 (문학동네)", "장르": "기타", "최종_종합점수": 81.4}]},"박예준":{"ref": {"final_rank": 5, "gap_rank": 13, "grade": "1학년", "records": 101, "initial": 70.7, "final": 82.6, "gap": 11.9, "pct": "상위 33.3%", "group": "우수 성장"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "사실 나열 비중이 높아 인과 표현 보강이 필요합니다.", "CI": "개인 의견은 있으나 성찰 문장 확장이 더 필요합니다.", "HS": "100건 안팎의 기록이 유지되어 독서 루틴이 안정적으로 형성되었습니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 48.0, "CI_점수": 26.0, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 70.7}, "중기": {"BW_점수": 100.0, "SO_점수": 49.3, "CI_점수": 30.0, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 76.7}, "후기": {"BW_점수": 100.0, "SO_점수": 48.7, "CI_점수": 27.3, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 82.6}}, "genres": {"기타": 101}, "books": {"초기": 33, "중기": 33, "후기": 35}, "recent": [{"날짜": "2026-02-28", "도서명": "그림으로 만나는 사계절 24절기 (머스트비)", "장르": "기타", "최종_종합점수": 82.6}, {"날짜": "2026-02-27", "도서명": "꼴랴와 별별직업 (계수나무)", "장르": "기타", "최종_종합점수": 82.6}, {"날짜": "2026-02-26", "도서명": "봄파 할아버지와 곤충 탐험을 떠나요 (찰리북)", "장르": "기타", "최종_종합점수": 82.6}, {"날짜": "2026-02-25", "도서명": "그렇게 치킨이 된다 (노란상상)", "장르": "기타", "최종_종합점수": 82.6}, {"날짜": "2026-02-24", "도서명": "나는 그냥 나입니다 (노란돼지)", "장르": "기타", "최종_종합점수": 82.6}]},"임리우":{"ref": {"final_rank": 4, "gap_rank": 14, "grade": "6세", "records": 101, "initial": 72.3, "final": 83.2, "gap": 10.9, "pct": "상위 26.7%", "group": "우수 성장"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "이유-결과 연결은 보이지만 접속 구조의 다양화가 더 필요합니다.", "CI": "내용 요약 중심으로, 자기 관점 문장 확대가 필요합니다.", "HS": "100건 안팎의 기록이 유지되어 독서 루틴이 안정적으로 형성되었습니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 45.3, "CI_점수": 29.3, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 72.3}, "중기": {"BW_점수": 100.0, "SO_점수": 49.3, "CI_점수": 30.7, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 77.8}, "후기": {"BW_점수": 100.0, "SO_점수": 47.3, "CI_점수": 29.3, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 83.2}}, "genres": {"기타": 97, "인문사회": 1, "문학": 2, "자연과학": 1}, "books": {"초기": 33, "중기": 33, "후기": 35}, "recent": [{"날짜": "2026-03-08", "도서명": "질문하면 바로바로 답이 나오는 챗GPT (뭉치)", "장르": "기타", "최종_종합점수": 83.2}, {"날짜": "2026-03-07", "도서명": "우리 몸을 돌고 도는 피 (봄마중)", "장르": "기타", "최종_종합점수": 83.2}, {"날짜": "2026-03-04", "도서명": "내 인생 최악의 일주일 1 월요일 (비룡소)", "장르": "기타", "최종_종합점수": 83.2}, {"날짜": "2026-03-03", "도서명": "끝말잇기 제왕의 비법 (잇츠북어린이)", "장르": "기타", "최종_종합점수": 83.2}, {"날짜": "2026-03-01", "도서명": "파브르 곤충기 (출판사 무관)", "장르": "기타", "최종_종합점수": 83.2}]},"박서준":{"ref": {"final_rank": 10, "gap_rank": 15, "grade": "6세", "records": 93, "initial": 69.2, "final": 79.6, "gap": 10.4, "pct": "상위 66.7%", "group": "안정 궤도"}, "evals": {"BW": "서술량이 충분하고 문장 전개가 비교적 안정적입니다.", "SO": "사실 나열 비중이 높아 인과 표현 보강이 필요합니다.", "CI": "내용 요약 중심으로, 자기 관점 문장 확대가 필요합니다.", "HS": "주기적 참여가 유지되어 습관 기반은 확보된 상태입니다.", "GS": "대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다."}, "scores": {"초기": {"BW_점수": 100.0, "SO_점수": 46.7, "CI_점수": 25.2, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 69.2}, "중기": {"BW_점수": 100.0, "SO_점수": 46.2, "CI_점수": 23.1, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 74.4}, "후기": {"BW_점수": 100.0, "SO_점수": 45.9, "CI_점수": 26.7, "HS_점수": 100.0, "GS_점수": 70.0, "최종_종합점수": 79.6}}, "genres": {"기타": 93}, "books": {"초기": 31, "중기": 31, "후기": 31}, "recent": [{"날짜": "2026-03-10", "도서명": "도요휴게소 (킨더랜드)", "장르": "기타", "최종_종합점수": 79.6}, {"날짜": "2026-03-09", "도서명": "등대와 엄마고양이 (이지북)", "장르": "기타", "최종_종합점수": 79.6}, {"날짜": "2026-03-08", "도서명": "꼬리, 꼬리, 누구 꼬리? (보랏빛소어린이)", "장르": "기타", "최종_종합점수": 79.6}, {"날짜": "2026-03-07", "도서명": "바나나 선생님 (북뱅크)", "장르": "기타", "최종_종합점수": 79.6}, {"날짜": "2026-03-06", "도서명": "찍찍찍 마을 옥수수 축제 (위즈덤하우스)", "장르": "기타", "최종_종합점수": 79.6}]}};
+
+const GRADE_MAP = {"김시경":"5학년","이다민":"3학년","김근주":"5학년","이사벨":"7세","이희정":"3학년","엄희재":"4학년","윤희찬":"1학년","김도은":"5학년","최지온":"2학년","이채윤":"4학년","김윤주":"2학년","이수정":"6세","박예준":"1학년","임리우":"6세","박서준":"6세"};
+const STUDENTS = ["김시경", "이다민", "김근주", "이사벨", "이희정", "엄희재", "윤희찬", "김도은", "최지온", "이채윤", "김윤주", "이수정", "박예준", "임리우", "박서준"];
+const PERIODS = ['초기','중기','후기'];
+const CATS = ['BW_점수','SO_점수','CI_점수','HS_점수','GS_점수'];
+const CAT_LABELS = ['BW 어휘','SO 논리','CI 비판','HS 구조','GS 장르'];
+const LINE_COLORS = ['#E05A1A','#2563EB','#16A34A','#9333EA','#D97706'];
+const GENRE_COLORS = {'기타':'#CBD5E1','문학':'#E05A1A','인문사회':'#2563EB','자연과학':'#16A34A'};
+
+const EVAL_CFG = [
+  {key:'BW_점수', tag:'BW', name:'어휘·서술', bg:'#FFF4EC', tc:'#C2440A', border:'#FECDAA',
+   rules:[
+    {min:80, text:'서술량이 충분하고 문장 전개가 비교적 안정적입니다.'},
+    {min:50, text:'서술량은 보통 수준이며, 문장 전개 안정성을 높이는 연습이 필요합니다.'},
+    {min:0,  text:'서술량 확보와 문장 구성력 향상이 우선 필요합니다.'}
+  ]},
+  {key:'SO_점수', tag:'SO', name:'논리·접속', bg:'#EFF6FF', tc:'#1D4ED8', border:'#BFDBFE',
+   rules:[
+    {min:30, text:'접속사 활용이 활발하며 인과 표현이 잘 나타납니다.'},
+    {min:10, text:'사실 나열 비중이 높아 인과 표현 보강이 필요합니다.'},
+    {min:0,  text:'접속사 활용이 매우 제한적이며 논리적 연결 표현 연습이 시급합니다.'}
+  ]},
+  {key:'CI_점수', tag:'CI', name:'비판·추상', bg:'#F5F3FF', tc:'#6D28D9', border:'#DDD6FE',
+   rules:[
+    {min:40, text:'자기 관점이 명확하게 드러나며 비판적 사고가 잘 발휘됩니다.'},
+    {min:20, text:'내용 요약 중심으로, 자기 관점 문장 확대가 필요합니다.'},
+    {min:0,  text:'내용 요약에 그치고 있어 비판적 관점 표현 훈련이 필요합니다.'}
+  ]},
+  {key:'HS_점수', tag:'HS', name:'습관·참여', bg:'#F0FDF4', tc:'#166534', border:'#BBF7D0',
+   rules:[
+    {min:80, text:'주기적 참여가 유지되어 습관 기반은 확보된 상태입니다.'},
+    {min:50, text:'참여가 불규칙하여 꾸준한 독서 습관 형성이 필요합니다.'},
+    {min:0,  text:'참여 빈도가 낮아 독서 루틴 구축이 시급합니다.'}
+  ]},
+  {key:'GS_점수', tag:'GS', name:'장르·스펙트럼', bg:'#FFF7ED', tc:'#92400E', border:'#FED7AA',
+   rules:[
+    {min:60, text:'다양한 장르 경험이 확인되며 균형 잡힌 독서가 이루어지고 있습니다.'},
+    {min:30, text:'대표 원문 기준 장르 경험은 확인되며, 누적 로그 기준 장르 스펙트럼 추가 점검을 권장합니다.'},
+    {min:0,  text:'장르 편중이 심하며 다양한 분야의 독서 경험 확대가 필요합니다.'}
+  ]}
+];
+
+function getEvalText(rules, score){
+  return (rules.find(r=>score>=r.min)||rules[rules.length-1]).text;
+}
+
+const GROWTH_RANK = {"김시경":1,"이다민":2,"김근주":3,"이사벨":4,"이희정":5,"엄희재":6,"윤희찬":7,"김도은":8,"최지온":9,"이채윤":9,"김윤주":11,"이수정":12,"박예준":13,"임리우":14,"박서준":15};
+const FINAL_RANK = {"김시경":3,"이다민":12,"김근주":11,"이사벨":5,"이희정":7,"엄희재":13,"윤희찬":9,"김도은":14,"최지온":2,"이채윤":15,"김윤주":1,"이수정":8,"박예준":5,"임리우":4,"박서준":10};
+
+
+function rankBadgeClass(rank){
+  if(rank===1) return 'rank-badge rank-1';
+  if(rank===2) return 'rank-badge rank-2';
+  if(rank===3) return 'rank-badge rank-3';
+  if(rank<=5)  return 'rank-badge rank-top';
+  if(rank<=10) return 'rank-badge rank-mid';
+  return 'rank-badge rank-low';
+}
+
+function getOneLiner(name, lateScores, delta){
+  const bw = lateScores['BW_점수']||0;
+  const so = lateScores['SO_점수']||0;
+  const ci = lateScores['CI_점수']||0;
+  const hs = lateScores['HS_점수']||0;
+  const gs = lateScores['GS_점수']||0;
+  const rank = GROWTH_RANK[name];
+
+  // Find strongest and weakest
+  const scores = [{k:'어휘',v:bw},{k:'논리',v:so},{k:'비판',v:ci},{k:'습관',v:hs},{k:'장르',v:gs}];
+  const sorted = [...scores].sort((a,b)=>b.v-a.v);
+  const strong = sorted[0].k;
+  const weak = sorted[sorted.length-1].k;
+
+  const trend = delta > 5 ? '꾸준한 성장세를 보이고 있으며' : delta > 0 ? '소폭 향상되었으며' : delta > -5 ? '전반적으로 유지 수준이며' : '일부 점수 하락이 확인되었으며';
+  const weakAdv = weak==='논리' ? '인과·접속 표현 연습을' : weak==='비판' ? '자기 관점 서술 확대를' : weak==='장르' ? '장르 다양성 확보를' : weak==='습관' ? '규칙적 독서 참여를' : '서술량 강화를';
+
+  return `<strong>${name}</strong> 학생은 ${strong} 영역이 강점이며, ${trend} <strong>${weak}</strong> 영역 보완을 위해 ${weakAdv} 우선 권장합니다. (성장률 순위 <strong>${rank}위</strong> / ${STUDENTS.length}명)`;
+}
+
+function buildSidebar(){
+  const el = document.getElementById('stu-list');
+  // 사이드바 헤더
+  const hdr = document.createElement('div');
+  hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:4px 10px 6px;border-bottom:1px solid #f0f0f0;margin-bottom:4px';
+  hdr.innerHTML='<span style="font-size:10px;color:#aaa;letter-spacing:0.05em">학생</span><span style="font-size:10px;font-weight:700;color:#E05A1A;letter-spacing:0.05em">성장률</span>';
+  el.appendChild(hdr);
+  STUDENTS.forEach((s,i)=>{
+    const btn = document.createElement('button');
+    btn.className='stu-btn'+(i===0?' active':'');
+    const rank = GROWTH_RANK[s];
+    const grade = GRADE_MAP[s] || '';
+    btn.innerHTML=`<span class="avatar">${s.slice(0,1)}</span><span class="stu-name-wrap"><span class="stu-nm">${s}</span><span class="stu-grade-tag">${grade}</span></span><span class="${rankBadgeClass(rank)}">${rank}위</span>`;
+    btn.onclick=()=>{
+      document.querySelectorAll('.stu-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      render(s);
+    };
+    el.appendChild(btn);
+  });
+}
+
+let lineChart, radarChart, genreChart;
+
+function render(name){
+  const d = DATA[name];
+  const ref = d.ref;
+  document.getElementById('stu-title').textContent = name;
+  const early = ref.initial;
+  const late  = ref.final;
+  const delta = ref.gap;
+  const totalBooks = ref.records;
+
+  document.getElementById('s-early').textContent = early.toFixed(1)+'점';
+  document.getElementById('s-late').textContent  = late.toFixed(1)+'점';
+  const dEl = document.getElementById('s-delta');
+  dEl.textContent = (delta>=0?'+':'')+delta.toFixed(1)+'점';
+  dEl.className = 'card-value '+(delta>1?'up':delta<-1?'down':'neutral');
+  document.getElementById('s-books').textContent = totalBooks+'권';
+  if(document.getElementById('stu-grade-badge')){
+    document.getElementById('stu-grade-badge').textContent = ref.grade;
+    const de = document.getElementById('stu-diag-badge');
+    if(de){
+      if(ref.group==='TOP 리더'){
+        de.textContent='TOP 리더';
+        de.style.color='#1B4F72'; de.style.background='#D6EAF8'; de.style.borderColor='#AED6F1';
+        de.style.display='inline-block';
+      } else {
+        de.style.display='none';
+      }
+    }
+  }
+
+  // Legend
+  const lg = document.getElementById('line-legend');
+  lg.innerHTML = CAT_LABELS.map((l,i)=>`<span class="leg"><span class="leg-sq" style="background:${LINE_COLORS[i]}"></span>${l}</span>`).join('');
+
+  // Line chart
+  const lineDsets = CATS.map((c,i)=>({
+    label: CAT_LABELS[i],
+    data: PERIODS.map(p=>+(d.scores[p][c]||0).toFixed(1)),
+    borderColor: LINE_COLORS[i],
+    backgroundColor: LINE_COLORS[i],
+    borderWidth:2, pointRadius:5, pointHoverRadius:7,
+    tension:0.3, fill:false
+  }));
+  if(lineChart) lineChart.destroy();
+  lineChart = new Chart(document.getElementById('lineChart'),{
+    type:'line',
+    data:{labels:PERIODS, datasets:lineDsets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}점`}}},
+      scales:{
+        y:{min:0,max:100,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},color:'#999'}},
+        x:{grid:{display:false},ticks:{font:{size:11},color:'#666'}}
+      }
+    }
+  });
+
+  // Radar
+  const radarData = CATS.map(c=>+(d.scores['후기'][c]||0).toFixed(1));
+  if(radarChart) radarChart.destroy();
+  radarChart = new Chart(document.getElementById('radarChart'),{
+    type:'radar',
+    data:{
+      labels: CAT_LABELS,
+      datasets:[{label:'후기',data:radarData,borderColor:'#E05A1A',backgroundColor:'rgba(224,90,26,0.15)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#E05A1A'}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},grid:{color:'rgba(0,0,0,0.08)'},pointLabels:{font:{size:10},color:'#666'}}}
+    }
+  });
+
+  // Genre doughnut
+  const genres = Object.keys(d.genres);
+  const genreVals = genres.map(g=>d.genres[g]);
+  const gColors = genres.map(g=>GENRE_COLORS[g]||'#CBD5E1');
+  if(genreChart) genreChart.destroy();
+  genreChart = new Chart(document.getElementById('genreChart'),{
+    type:'doughnut',
+    data:{labels:genres, datasets:[{data:genreVals,backgroundColor:gColors,borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',
+      plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:10,padding:6,color:'#555'}},
+        tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed}권`}}}
+    }
+  });
+
+  // Books table
+  const tbody = document.getElementById('books-tbody');
+  tbody.innerHTML='';
+  d.recent.forEach(b=>{
+    const s = b['최종_종합점수'];
+    const bg = s>=60?'#DCFCE7':s>=40?'#FEF3C7':'#FEE2E2';
+    const tc = s>=60?'#166534':s>=40?'#92400E':'#991B1B';
+    const tr = document.createElement('tr');
+    tr.innerHTML=`<td>${b['날짜'].slice(5)}</td><td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b['도서명']}</td><td>${b['장르']}</td><td><span class="pill" style="background:${bg};color:${tc}">${s.toFixed(1)}</span></td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Eval cards
+  const lateScores = d.scores['후기'] || {};
+  const evalGrid = document.getElementById('eval-grid');
+  evalGrid.innerHTML = '';
+  const evals = d.evals || {};
+  const evalCfgDisplay = [
+    {tag:'BW', name:'어휘·서술', bg:'#FFF4EC', tc:'#C2440A', border:'#FECDAA'},
+    {tag:'SO', name:'논리·접속', bg:'#EFF6FF', tc:'#1D4ED8', border:'#BFDBFE'},
+    {tag:'CI', name:'비판·추상', bg:'#F5F3FF', tc:'#6D28D9', border:'#DDD6FE'},
+    {tag:'HS', name:'습관·참여', bg:'#F0FDF4', tc:'#166534', border:'#BBF7D0'},
+    {tag:'GS', name:'장르·스펙트럼', bg:'#FFF7ED', tc:'#92400E', border:'#FED7AA'},
+  ];
+  evalCfgDisplay.forEach(cfg=>{
+    const text = evals[cfg.tag] || '—';
+    const card = document.createElement('div');
+    card.className = 'eval-card';
+    card.style.cssText = `background:${cfg.bg};border:1px solid ${cfg.border}`;
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span class="eval-tag" style="color:${cfg.tc}">${cfg.tag}</span>
+      </div>
+      <div class="eval-name" style="color:${cfg.tc};opacity:0.75">${cfg.name}</div>
+      <div style="width:100%;height:3px;background:rgba(0,0,0,0.08);border-radius:2px;margin:6px 0 8px"></div>
+      <div class="eval-text">${text}</div>
+    `;
+    evalGrid.appendChild(card);
+  });
+  // 한 줄 종합 평가
+  document.getElementById('eval-oneliner').innerHTML = getOneLiner(name, lateScores, delta);
+}
+
+buildSidebar();
+render(STUDENTS[0]);
+</script>
+</body>
+</html>
