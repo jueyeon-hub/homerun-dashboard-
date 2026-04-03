@@ -7,12 +7,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Apple SD Gothic Neo','맑은 고딕',sans-serif;background:#F5F4F0;color:#1a1a1a;min-height:100vh}
+body{font-family:'Apple SD Gothic Neo','맑은 고딕',sans-serif;background:#F5F4F0;color:#1a1a1a;min-height:100vh;max-width:1200px;margin:0 auto}
 header{background:#fff;border-bottom:1px solid #e8e8e8;padding:14px 24px;display:flex;align-items:center;gap:12px}
 .logo{width:34px;height:34px;background:#E05A1A;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px}
 header h1{font-size:20px;font-weight:700;color:#1a1a1a}
 header .sub{font-size:14px;color:#aaa;margin-left:6px}
-.layout{display:grid;grid-template-columns:190px 1fr;height:calc(100vh - 63px)}
+.layout{display:grid;grid-template-columns:190px 1fr;height:calc(100vh - 63px);max-width:1200px;margin:0 auto}
 .sidebar{background:#fff;border-right:1px solid #e8e8e8;padding:10px 6px;overflow-y:auto}
 .sidebar-label{font-size:12px;color:#bbb;padding:0 8px 4px;letter-spacing:0.08em}
 .sidebar-section-title{font-size:12px;font-weight:700;color:#E05A1A;padding:6px 10px 4px;letter-spacing:0.05em;text-transform:uppercase}
@@ -113,12 +113,12 @@ table.bt td{padding:6px 8px;color:#555;border-bottom:1px solid #f8f8f8;overflow:
         <div class="chart-title">역량별 성장 추이</div>
         <div class="chart-sub">초기 / 중기 / 후기 평균 점수</div>
         <div id="line-legend" class="legend-row"></div>
-        <div style="position:relative;width:100%;height:0;padding-bottom:45%;min-height:160px"><canvas id="lineChart" style="position:absolute;top:0;left:0;width:100%!important;height:100%!important"></canvas></div>
+        <div style="position:relative;width:100%;height:0;padding-bottom:38%;min-height:160px"><canvas id="lineChart" style="position:absolute;top:0;left:0;width:100%!important;height:100%!important"></canvas></div>
       </div>
       <div class="chart-box">
         <div class="chart-title">역량 프로필</div>
         <div class="chart-sub">후기 기준 5개 영역</div>
-        <div style="position:relative;width:100%;height:0;padding-bottom:75%;min-height:180px"><canvas id="radarChart" style="position:absolute;top:0;left:0;width:100%!important;height:100%!important"></canvas></div>
+        <div style="position:relative;width:100%;height:0;padding-bottom:65%;min-height:180px"><canvas id="radarChart" style="position:absolute;top:0;left:0;width:100%!important;height:100%!important"></canvas></div>
       </div>
     </div>
     <div class="eval-section">
