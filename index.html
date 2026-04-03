@@ -9,57 +9,57 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Apple SD Gothic Neo','맑은 고딕',sans-serif;background:#F5F4F0;color:#1a1a1a;min-height:100vh}
 header{background:#fff;border-bottom:1px solid #e8e8e8;padding:14px 24px;display:flex;align-items:center;gap:12px}
-.logo{width:34px;height:34px;background:#E05A1A;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
-header h1{font-size:17px;font-weight:700;color:#1a1a1a}
-header .sub{font-size:12px;color:#aaa;margin-left:6px}
+.logo{width:34px;height:34px;background:#E05A1A;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px}
+header h1{font-size:20px;font-weight:700;color:#1a1a1a}
+header .sub{font-size:14px;color:#aaa;margin-left:6px}
 .layout{display:grid;grid-template-columns:190px 1fr;height:calc(100vh - 63px)}
 .sidebar{background:#fff;border-right:1px solid #e8e8e8;padding:10px 6px;overflow-y:auto}
-.sidebar-label{font-size:10px;color:#bbb;padding:0 8px 4px;letter-spacing:0.08em}
-.sidebar-section-title{font-size:10px;font-weight:700;color:#E05A1A;padding:6px 10px 4px;letter-spacing:0.05em;text-transform:uppercase}
-.stu-btn{width:100%;text-align:left;border:none;background:transparent;padding:5px 8px;border-radius:8px;cursor:pointer;color:#555;transition:all 0.15s;display:flex;align-items:center;gap:6px;margin-bottom:1px}
+.sidebar-label{font-size:12px;color:#bbb;padding:0 8px 4px;letter-spacing:0.08em}
+.sidebar-section-title{font-size:12px;font-weight:700;color:#E05A1A;padding:6px 10px 4px;letter-spacing:0.05em;text-transform:uppercase}
+.stu-btn{width:100%;text-align:left;border:none;background:transparent;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:15px;color:#555;transition:all 0.15s;display:flex;align-items:center;gap:6px;margin-bottom:1px}
 .stu-btn:hover{background:#FFF4EC;color:#C2440A}
 .stu-btn.active{background:#FFF4EC;color:#C2440A;font-weight:600}
-.avatar{width:22px;height:22px;border-radius:50%;background:#f0f0f0;color:#888;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.avatar{width:22px;height:22px;border-radius:50%;background:#f0f0f0;color:#888;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .stu-btn.active .avatar{background:#E05A1A;color:#fff}
 .stu-name-wrap{display:flex;flex-direction:column;gap:0px;flex:1;min-width:0}
-.stu-nm{font-size:12px;font-weight:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stu-grade-tag{font-size:10px;color:#bbb;font-weight:400}
+.stu-nm{font-size:15px;font-weight:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stu-grade-tag{font-size:13px;color:#bbb;font-weight:400}
 .stu-btn.active .stu-grade-tag{color:#C2440A;opacity:0.7}
 .main{padding:18px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
 .top-bar{display:flex;align-items:flex-end;justify-content:space-between}
-.stu-name{font-size:20px;font-weight:700}
-.stu-sub{font-size:12px;color:#999;margin-top:2px}
-.badge{background:#FFF4EC;color:#C2440A;border:1px solid #FECDAA;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:500}
+.stu-name{font-size:24px;font-weight:700}
+.stu-sub{font-size:14px;color:#999;margin-top:2px}
+.badge{background:#FFF4EC;color:#C2440A;border:1px solid #FECDAA;border-radius:20px;padding:4px 14px;font-size:14px;font-weight:500}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .card{background:#fff;border:1px solid #ebebeb;border-radius:12px;padding:14px 16px}
-.card-label{font-size:11px;color:#bbb;margin-bottom:6px;font-weight:500}
-.card-value{font-size:24px;font-weight:700;color:#1a1a1a}
+.card-label{font-size:14px;color:#bbb;margin-bottom:6px;font-weight:500}
+.card-value{font-size:26px;font-weight:700;color:#1a1a1a}
 .card-value.orange{color:#E05A1A}
 .card-value.up{color:#16A34A}
 .card-value.down{color:#DC2626}
 .charts-row{display:grid;grid-template-columns:1.8fr 1fr;gap:12px}
 .chart-box{background:#fff;border:1px solid #ebebeb;border-radius:12px;padding:16px}
-.chart-title{font-size:12px;font-weight:600;color:#444;margin-bottom:4px}
-.chart-sub{font-size:11px;color:#bbb;margin-bottom:12px}
+.chart-title{font-size:15px;font-weight:600;color:#444;margin-bottom:4px}
+.chart-sub{font-size:14px;color:#bbb;margin-bottom:12px}
 .legend-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.leg{display:flex;align-items:center;gap:4px;font-size:11px;color:#666}
+.leg{display:flex;align-items:center;gap:4px;font-size:14px;color:#666}
 .leg-sq{width:9px;height:9px;border-radius:2px;flex-shrink:0}
 .bottom-row{display:grid;grid-template-columns:1fr 1.9fr;gap:12px}
-table.bt{width:100%;font-size:12px;border-collapse:collapse;table-layout:fixed}
-table.bt th{color:#bbb;font-weight:500;padding:4px 8px;text-align:left;border-bottom:1px solid #f0f0f0;font-size:11px}
+table.bt{width:100%;font-size:15px;border-collapse:collapse;table-layout:fixed}
+table.bt th{color:#bbb;font-weight:500;padding:4px 8px;text-align:left;border-bottom:1px solid #f0f0f0;font-size:14px}
 table.bt td{padding:6px 8px;color:#555;border-bottom:1px solid #f8f8f8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:14px;font-weight:600}
 .eval-section{background:#fff;border:1px solid #ebebeb;border-radius:12px;padding:16px}
 .eval-section .chart-title{margin-bottom:14px}
 .eval-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .eval-card{border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
-.eval-tag{font-size:11px;font-weight:700;letter-spacing:0.04em}
-.eval-name{font-size:11px;color:#888;margin-top:-4px}
-.eval-text{font-size:12px;line-height:1.55;color:#444}
-.eval-score{font-size:18px;font-weight:700;margin-top:4px}
-.oneliner{margin-top:12px;background:#F8F7F4;border-left:3px solid #E05A1A;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#444;line-height:1.6}
+.eval-tag{font-size:14px;font-weight:700;letter-spacing:0.04em}
+.eval-name{font-size:14px;color:#888;margin-top:-4px}
+.eval-text{font-size:15px;line-height:1.55;color:#444}
+.eval-score{font-size:20px;font-weight:700;margin-top:4px}
+.oneliner{margin-top:12px;background:#F8F7F4;border-left:3px solid #E05A1A;border-radius:0 8px 8px 0;padding:10px 14px;font-size:16px;color:#444;line-height:1.6}
 .oneliner strong{color:#C2440A;font-weight:600}
-.rank-badge{font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:auto;flex-shrink:0}
+.rank-badge{font-size:12px;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:auto;flex-shrink:0}
 .rank-1{background:#FFD700;color:#7A5500}
 .rank-2{background:#C0C0C0;color:#4A4A4A}
 .rank-3{background:#CD7F32;color:#5A3A00}
@@ -83,8 +83,8 @@ table.bt td{padding:6px 8px;color:#555;border-bottom:1px solid #f8f8f8;overflow:
     <div class="top-bar">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <div class="stu-name" id="stu-title">—</div>
-        <span id="stu-grade-badge" style="font-size:12px;font-weight:600;color:#C2440A;background:#FFF4EC;border:1px solid #FECDAA;border-radius:20px;padding:3px 10px;white-space:nowrap">—</span>
-        <span id="stu-diag-badge" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #e0e0e0;white-space:nowrap">—</span>
+        <span id="stu-grade-badge" style="font-size:14px;font-weight:600;color:#C2440A;background:#FFF4EC;border:1px solid #FECDAA;border-radius:20px;padding:3px 10px;white-space:nowrap">—</span>
+        <span id="stu-diag-badge" style="font-size:13px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #e0e0e0;white-space:nowrap">—</span>
       </div>
       
     </div>
@@ -108,7 +108,7 @@ table.bt td{padding:6px 8px;color:#555;border-bottom:1px solid #f8f8f8;overflow:
       </div>
     </div>
     <div class="eval-section">
-      <div class="chart-title">전문가 평가 내역 <span style="font-size:11px;color:#bbb;font-weight:400">후기 점수 기준</span></div>
+      <div class="chart-title">전문가 평가 내역 <span style="font-size:13px;color:#bbb;font-weight:400">후기 점수 기준</span></div>
       <div class="eval-grid" id="eval-grid"></div>
       <div class="oneliner" id="eval-oneliner"></div>
     </div>
@@ -220,7 +220,7 @@ function buildSidebar(){
   // 사이드바 헤더
   const hdr = document.createElement('div');
   hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:4px 10px 6px;border-bottom:1px solid #f0f0f0;margin-bottom:4px';
-  hdr.innerHTML='<span style="font-size:10px;color:#aaa;letter-spacing:0.05em">학생</span><span style="font-size:10px;font-weight:700;color:#E05A1A;letter-spacing:0.05em">성장률</span>';
+  hdr.innerHTML='<span style="font-size:12px;color:#aaa;letter-spacing:0.05em">학생</span><span style="font-size:12px;font-weight:700;color:#E05A1A;letter-spacing:0.05em">성장률</span>';
   el.appendChild(hdr);
   STUDENTS.forEach((s,i)=>{
     const btn = document.createElement('button');
