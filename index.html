@@ -37,8 +37,8 @@ header .sub{font-size:14px;color:#aaa;margin-left:6px}
 .card-value.orange{color:#E05A1A}
 .card-value.up{color:#16A34A}
 .card-value.down{color:#DC2626}
-.charts-row{display:grid;grid-template-columns:1.8fr 1fr;gap:12px}
-.chart-box{background:#fff;border:1px solid #ebebeb;border-radius:12px;padding:16px}
+.charts-row{display:grid;grid-template-columns:1.8fr 1fr;gap:12px;min-width:0}
+.chart-box{background:#fff;border:1px solid #ebebeb;border-radius:12px;padding:16px;min-width:0;overflow:hidden}
 .chart-title{font-size:15px;font-weight:600;color:#444;margin-bottom:4px}
 .chart-sub{font-size:14px;color:#bbb;margin-bottom:12px}
 .legend-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
@@ -66,6 +66,20 @@ table.bt td{padding:6px 8px;color:#555;border-bottom:1px solid #f8f8f8;overflow:
 .rank-top{background:#FFF4EC;color:#C2440A}
 .rank-mid{background:#F3F4F6;color:#6B7280}
 .rank-low{background:#F3F4F6;color:#9CA3AF}
+
+@media(max-width:900px){
+  .charts-row{grid-template-columns:1fr!important}
+  .bottom-row{grid-template-columns:1fr!important}
+  .cards{grid-template-columns:repeat(2,1fr)!important}
+  .eval-grid{grid-template-columns:repeat(2,1fr)!important}
+  .layout{grid-template-columns:160px 1fr}
+}
+@media(max-width:600px){
+  .layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .sidebar{height:auto;border-right:none;border-bottom:1px solid #e8e8e8;display:flex;flex-wrap:wrap;gap:4px;padding:8px}
+  .stu-btn{width:auto}
+  .cards{grid-template-columns:repeat(2,1fr)!important}
+}
 </style>
 </head>
 <body>
@@ -99,12 +113,12 @@ table.bt td{padding:6px 8px;color:#555;border-bottom:1px solid #f8f8f8;overflow:
         <div class="chart-title">역량별 성장 추이</div>
         <div class="chart-sub">초기 / 중기 / 후기 평균 점수</div>
         <div id="line-legend" class="legend-row"></div>
-        <div style="position:relative;height:180px"><canvas id="lineChart"></canvas></div>
+        <div style="position:relative;width:100%;height:0;padding-bottom:45%;min-height:160px"><canvas id="lineChart" style="position:absolute;top:0;left:0;width:100%!important;height:100%!important"></canvas></div>
       </div>
       <div class="chart-box">
         <div class="chart-title">역량 프로필</div>
         <div class="chart-sub">후기 기준 5개 영역</div>
-        <div style="position:relative;height:200px"><canvas id="radarChart"></canvas></div>
+        <div style="position:relative;width:100%;height:0;padding-bottom:75%;min-height:180px"><canvas id="radarChart" style="position:absolute;top:0;left:0;width:100%!important;height:100%!important"></canvas></div>
       </div>
     </div>
     <div class="eval-section">
